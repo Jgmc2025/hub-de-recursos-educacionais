@@ -1,12 +1,29 @@
 import time
 import logging
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from app.models import Resource, SessionLocal, init_db
 from app.schemas import SmartAssistRequest, SmartAssistResponse
 from app.services.ai_service import generate_educational_metadata
 
-app = FastAPI()
+init_db()
+app = FastAPI(title="Hub de Recursos Educacionais")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @app.post("/smart-assist", response_model=SmartAssistResponse)
 async def smart_assist(data: SmartAssistRequest):
@@ -19,3 +36,40 @@ async def smart_assist(data: SmartAssistRequest):
     except Exception as e:
         logger.error(f"[ERROR] Falha na IA: {str(e)}")
         raise HTTPException(status_code=500, detail="Erro ao processar sugestão da IA.")
+
+@app.post("/resources")
+def create_resource(data: dict, db: Session = Depends(get_db)):
+    new_resource = Resource(
+        title=data['title'],
+        description=data['description'],
+        resource_type=data['resource_type'],
+        tags=data['tags']
+    )
+    db.add(new_resource)
+    db.commit()
+    db.refresh(new_resource)
+    return new_resource
+
+@app.get("/resources")
+def list_resources(db: Session = Depends(get_db)):
+    return db.query(Resource).all()
+
+@app.delete("/resources/{resource_id}")
+def delete_resource(resource_id: int, db: Session = Depends(get_db)):
+    resource = db.query(Resource).filter(Resource.id == resource_id).first()
+    if not resource:
+        raise HTTPException(status_code=404, detail="Recurso não encontrado")
+    db.delete(resource)
+    db.commit()
+    return {"message": "Recurso removido com sucesso"}
+
+@app.put("/resources/{resource_id}")
+def update_resource(resource_id: int, data: dict, db: Session = Depends(get_db)):
+    resource = db.query(Resource).filter(Resource.id == resource_id).first()
+    if not resource:
+        raise HTTPException(status_code=404, detail="Recurso não encontrado")
+    for key, value in data.items():
+        setattr(resource, key, value)
+    db.commit()
+    db.refresh(resource)
+    return resource
