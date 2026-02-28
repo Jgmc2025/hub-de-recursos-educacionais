@@ -28,7 +28,7 @@ function App() {
       });
     } catch (error) {
       console.error("Erro na IA:", error);
-      alert("A IA falhou, mas você pode preencher manualmente.");
+      alert("O Serviço de Assistência por IA está indisponível no momento. Por favor, tente mais tarde.");
     } finally {
       setLoading(false);
     }
@@ -66,7 +66,7 @@ function App() {
               className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-gray-400 transition-colors"
             >
               {loading ? <Loader2 className="animate-spin" size={18} /> : <Sparkles size={18} />}
-              Smart Assist
+              Gerar Descrição com IA
             </button>
           </div>
           <div>
@@ -79,7 +79,7 @@ function App() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Tags (separadas por vírgula)</label>
+            <label className="block text-sm font-medium text-gray-700">Tags</label>
             <input 
               type="text"
               className="mt-1 block w-full border border-gray-300 rounded-md p-2"
