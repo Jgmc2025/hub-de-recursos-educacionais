@@ -227,3 +227,6 @@ build/
 # Debug logs do NPM
 /logs
 *.log
+
+# banco de dados
+hub_educacional.db
