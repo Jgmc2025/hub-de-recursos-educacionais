@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Sparkles, Loader2, Save } from 'lucide-react';
+import { Sparkles, Loader2, Save, Tag, X, Plus } from 'lucide-react';
 
 function App() {
-  const [loading, setLoading] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(null)
+  const [isAdding, setIsAdding] = useState(false); 
+  const [newTagValue, setNewTagValue] = useState('');
+  const [editValue, setEditValue] = useState('')
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     resource_type: 'Vídeo',
     tags: ''
   });
+  const tagsArray = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t !== '') : [];
   const handleSmartAssist = async () => {
     if (!formData.title) {
       alert("Digite um título primeiro!");
@@ -32,6 +37,42 @@ function App() {
     } finally {
       setLoading(false);
     }
+  };
+  const updateTagsString = (newArray) => {
+    setFormData({ ...formData, tags: newArray.join(', ') });
+  };
+  const removeTag = (indexToRemove) => {
+    updateTagsString(tagsArray.filter((_, index) => index !== indexToRemove));
+  };
+  const saveTagEdit = (index) => {
+    const cleanEdit = editValue.trim().toLowerCase();
+    if (!cleanEdit) {
+      setEditingIndex(null);
+      return;
+    }
+    const isDuplicate = tagsArray.some((tag, i) => i !== index && tag.toLowerCase() === cleanEdit);
+    if (isDuplicate) {
+      alert(`A tag "${cleanEdit}" já existe nesta lista!`);
+      setEditingIndex(null); 
+      return;
+    }
+    const newTags = [...tagsArray];
+    newTags[index] = editValue.trim(); 
+    updateTagsString(newTags);
+    setEditingIndex(null);
+  };
+  const addNewTag = () => {
+    const cleanTag = newTagValue.trim();
+    if (cleanTag) {
+      const tagExists = tagsArray.some(t => t.toLowerCase() === cleanTag.toLowerCase());
+      if (tagExists) {
+        alert("Esta tag já existe!");
+      } else {
+        updateTagsString([...tagsArray, cleanTag]);
+      }
+    }
+    setNewTagValue('');
+    setIsAdding(false);
   };
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -73,19 +114,59 @@ function App() {
             <label className="block text-sm font-medium text-gray-700">Descrição</label>
             <textarea 
               rows="4"
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+              className="mt-1 block w-full border border-gray-300 resize-none rounded-md p-2"
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Tags</label>
-            <input 
-              type="text"
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-              value={formData.tags}
-              onChange={(e) => setFormData({...formData, tags: e.target.value})}
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+            <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border border-gray-300 rounded-md min-h-[60px] items-center">
+              {tagsArray.map((tag, index) => (
+                <div key={index} className="flex items-center">
+                  {editingIndex === index ? (
+                    <input 
+                      autoFocus
+                      className="group flex items-center gap-1 bg-white text-indigo-600 text-xs font-bold px-3 py-1.5 rounded-md border border-indigo-100 shadow-sm hover:border-indigo-400 transition-all"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={() => saveTagEdit(index)}
+                      onKeyDown={(e) => e.key === 'Enter' && saveTagEdit(index)}
+                    />
+                  ) : (
+                    <span className="group flex items-center gap-1 bg-white text-indigo-600 text-xs font-bold px-3 py-1.5 rounded-md border border-indigo-100 shadow-sm hover:border-indigo-400 transition-all">
+                      <span onClick={() => { setEditingIndex(index); setEditValue(tag); }} className="cursor-pointer flex items-center gap-1">
+                        <Tag size={10} />
+                        {tag}
+                      </span>
+                      <X 
+                        size={14} 
+                        className="ml-1 text-gray-300 hover:text-red-500 cursor-pointer" 
+                        onClick={() => removeTag(index)}
+                      />
+                    </span>
+                  )}
+                </div>
+              ))}
+              {isAdding ? (
+                <input 
+                  autoFocus
+                  placeholder="Nome da tag..."
+                  className="group flex items-center gap-1 bg-white text-indigo-600 text-xs font-bold px-3 py-1.5 rounded-md border border-indigo-100 shadow-sm hover:border-indigo-400 transition-all"
+                  onChange={(e) => setNewTagValue(e.target.value)}
+                  onBlur={addNewTag}
+                  onKeyDown={(e) => e.key === 'Enter' && addNewTag()}
+                />
+              ) : (
+                <button 
+                  onClick={() => setIsAdding(true)}
+                  className="flex items-center gap-1 bg-white text-gray-400 text-xs font-bold px-3 py-1.5 rounded-md border border-dashed border-gray-300 hover:border-indigo-400 hover:text-indigo-500 transition-all shadow-sm"
+                >
+                  <Plus size={14} />
+                  Nova Tag
+                </button>
+              )}
+            </div>
           </div>
           <button className="w-full flex items-center justify-center gap-2 bg-green-600 text-white font-bold py-3 rounded-md hover:bg-green-700 mt-6">
             <Save size={20} /> Salvar Recurso
