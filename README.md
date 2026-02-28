@@ -24,12 +24,20 @@ Este projeto é uma aplicação Fullstack desenvolvida para centralizar e otimiz
 
 ---
 
+## 🏗️ Arquitetura do Sistema
+
+A aplicação segue o padrão de separação de responsabilidades:
+- **Client-Side:** React com hooks para gerenciamento de estado assíncrono.
+- **Server-Side:** FastAPI utilizando Injeção de Dependências para persistência de dados.
+- **AI Layer:** Integração com LLMs via Groq com estratégia de **Fallback** (resiliência caso a API falhe).
+
 ## ✨ Funcionalidades
 
 - [x] **CRUD Completo:** Gestão de vídeos, PDFs e links.
 - [x] **Smart Assist:** Geração de metadados via IA para agilizar o trabalho do conteudista.
 - [x] **Observabilidade:** Logs detalhados de tempo de resposta e uso de tokens da IA.
 - [x] **Interface Responsiva:** Feedback visual de carregamento e tratamento de erros.
+- [x] **Resiliência:** Mecanismo de fallback que garante o funcionamento do app mesmo com instabilidades na API de IA.
 
 ---
 
