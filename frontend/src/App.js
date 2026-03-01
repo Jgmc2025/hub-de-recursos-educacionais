@@ -80,13 +80,25 @@ function App() {
     if (!validateForm()) return;
     setLoading(true);
     try {
-      await axios.post('http://127.0.0.1:8000/resources', {
-        ...formData,
-        tags: tagsArray
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        resource_type: formData.resource_type,
+        url: formData.url,
+        tags: tagsArray.join(', ')
+      };
+      await axios.post('http://127.0.0.1:8000/resources', payload);
+      alert("Recurso salvo com sucesso!");
+      setFormData({ 
+        title: '', 
+        description: '', 
+        resource_type: 'Vídeo', 
+        tags: '', 
+        url: '' 
       });
-      alert("Recurso salvo com sucesso no hub_educacional.db!");
-      setFormData({ title: '', description: '', resource_type: 'Vídeo', tags: '', url: '' });
+      setView('list'); 
     } catch (error) {
+      console.error("Erro ao salvar:", error);
       alert("Erro ao conectar com o servidor.");
     } finally {
       setLoading(false);
