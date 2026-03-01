@@ -5,6 +5,10 @@ import Home from './Home';
 import Appointment from './Appointment';
 
 function App() {
+  const capitalizeFirst = (str) => {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
   const [view, setView] = useState('home');
   const [activeHelp, setActiveHelp] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null)
@@ -50,8 +54,8 @@ function App() {
       });
       setFormData({
         ...formData,
-        description: response.data.description,
-        tags: response.data.tags.join(', ')
+        description: capitalizeFirst(response.data.description),
+        tags: response.data.tags.map(t => capitalizeFirst(t.trim())).join(', ')
       });
     } catch (error) {
       console.error("Erro na IA:", error);
@@ -80,13 +84,25 @@ function App() {
     if (!validateForm()) return;
     setLoading(true);
     try {
-      await axios.post('http://127.0.0.1:8000/resources', {
-        ...formData,
-        tags: tagsArray
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        resource_type: formData.resource_type,
+        url: formData.url,
+        tags: tagsArray.join(', ')
+      };
+      await axios.post('http://127.0.0.1:8000/resources', payload);
+      alert("Recurso salvo com sucesso!");
+      setFormData({ 
+        title: '', 
+        description: '', 
+        resource_type: 'Vídeo', 
+        tags: '', 
+        url: '' 
       });
-      alert("Recurso salvo com sucesso no hub_educacional.db!");
-      setFormData({ title: '', description: '', resource_type: 'Vídeo', tags: '', url: '' });
+      setView('list'); 
     } catch (error) {
+      console.error("Erro ao salvar:", error);
       alert("Erro ao conectar com o servidor.");
     } finally {
       setLoading(false);
@@ -180,7 +196,7 @@ function App() {
               type="text"
               className={`block w-full border rounded-md p-2 outline-none transition-all ${titleError ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'}`}
               value={formData.title}
-              onChange={(e) => setFormData({...formData, title: e.target.value})}
+              onChange={(e) => setFormData({...formData, title: capitalizeFirst(e.target.value)})}
               placeholder='Insira o título...'
             />
             {titleError && <p className="text-red-500 text-xs mt-1">Mínimo de 3 dígitos.</p>}
@@ -231,7 +247,7 @@ function App() {
                 className="block w-full border-none bg-transparent py-2 px-3 pr-10 resize-none outline-none overflow-y-auto leading-relaxed text-black"
                 style={{ WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)' }}
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={(e) => setFormData({...formData, description: capitalizeFirst(e.target.value)})}
                 placeholder='Descreva o conteúdo completo...'
               />
             </div>
@@ -257,7 +273,7 @@ function App() {
                       autoFocus
                       className="group flex items-center gap-1 bg-white text-indigo-600 text-xs font-bold px-3 py-1.5 rounded-md border border-indigo-100 shadow-sm hover:border-indigo-400 transition-all"
                       value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
+                      onChange={(e) => setEditValue(capitalizeFirst(e.target.value))}
                       onBlur={() => saveTagEdit(index)}
                       onKeyDown={(e) => e.key === 'Enter' && saveTagEdit(index)}
                     />
@@ -281,7 +297,7 @@ function App() {
                   autoFocus
                   placeholder="Nome da tag..."
                   className="group flex items-center gap-1 bg-white text-indigo-600 text-xs font-bold px-3 py-1.5 rounded-md border border-indigo-100 shadow-sm hover:border-indigo-400 transition-all"
-                  onChange={(e) => setNewTagValue(e.target.value)}
+                  onChange={(e) => setNewTagValue(capitalizeFirst(e.target.value))}
                   onBlur={addNewTag}
                   onKeyDown={(e) => e.key === 'Enter' && addNewTag()}
                 />

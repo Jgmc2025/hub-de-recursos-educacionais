@@ -12,6 +12,7 @@ class Resource(Base):
     description = Column(Text)
     resource_type = Column(String(50))
     tags = Column(String(255))
+    url = Column(Text)
 SQLALCHEMY_DATABASE_URL = "sqlite:///./hub_educacional.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

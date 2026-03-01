@@ -43,7 +43,8 @@ def create_resource(data: dict, db: Session = Depends(get_db)):
         title=data['title'],
         description=data['description'],
         resource_type=data['resource_type'],
-        tags=data['tags']
+        tags=data['tags'],
+        url=data.get('url')
     )
     db.add(new_resource)
     db.commit()
