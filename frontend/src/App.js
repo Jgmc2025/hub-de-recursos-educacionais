@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Sparkles, Loader2, Save, Tag, X, Plus } from 'lucide-react';
+import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle } from 'lucide-react';
 
 function App() {
+  const [activeHelp, setActiveHelp] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null)
   const [isAdding, setIsAdding] = useState(false); 
   const [newTagValue, setNewTagValue] = useState('');
@@ -15,6 +16,24 @@ function App() {
     tags: '',
     url: ''
   });
+  const HelpButton = ({ id, text }) => (
+    <div className="relative inline-block ml-2">
+      <button
+        onMouseEnter={() => setActiveHelp(id)}
+        onMouseLeave={() => setActiveHelp(null)}
+        className="text-gray-400 hover:text-indigo-500 transition-colors"
+        type="button"
+      >
+        <HelpCircle size={14} />
+      </button>
+      {activeHelp === id && (
+        <div className="absolute z-10 bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-800 text-white text-[10px] rounded shadow-lg animate-in fade-in zoom-in duration-200">
+          {text}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-gray-800" />
+        </div>
+      )}
+    </div>
+  );
   const tagsArray = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t !== '') : [];
   const handleSmartAssist = async () => {
     if (!formData.title) {
@@ -133,6 +152,7 @@ function App() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Título</label>
+            <HelpButton id="title" text="Dê um nome claro e objetivo ao recurso para facilitar a busca futura." />
             <input 
               type="text"
               className={`block w-full border rounded-md p-2 outline-none transition-all ${titleError ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'}`}
@@ -170,6 +190,7 @@ function App() {
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Descrição</label>
+            <HelpButton id="desc" text="Explique brevemente o que o aluno encontrará neste recurso. A IA pode preencher isso para você!" />
             <div className={`relative border rounded-md bg-white transition-all ${descError ? 'border-red-500 focus-within:ring-2 focus-within:ring-red-200' : 'border-gray-300 focus-within:ring-2 focus-within:ring-indigo-500'}`}>
               <textarea 
                 rows="4"
@@ -184,6 +205,7 @@ function App() {
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Tags</label>
+            <HelpButton id="tags" text="Palavras-chave que ajudam a organizar seu conteúdo. Ex: 'React', 'Frontend', 'Iniciante'." />
             <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border border-gray-300 rounded-md min-h-[60px] items-center">
               {tagsArray.map((tag, index) => (
                 <div key={index} className="flex items-center">
@@ -233,6 +255,7 @@ function App() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1 font-semibold">URL</label>
+            <HelpButton id="url" text="Insira o link completo começando com http:// ou https:// para que o recurso possa ser acessado." />
             <input 
               type="url"
               className={`block w-full border rounded-md p-2 outline-none transition-all ${urlError ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'}`}
