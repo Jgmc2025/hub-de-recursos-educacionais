@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Sparkles, Loader2, Save, Tag, X, Plus } from 'lucide-react';
+import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle } from 'lucide-react';
 
 function App() {
+  const [activeHelp, setActiveHelp] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null)
   const [isAdding, setIsAdding] = useState(false); 
   const [newTagValue, setNewTagValue] = useState('');
@@ -15,6 +16,23 @@ function App() {
     tags: '',
     url: ''
   });
+  const HelpButton = ({ id, text }) => (
+    <span className="relative inline-block ml-2 align-middle">
+      <span
+        onMouseEnter={() => setActiveHelp(id)}
+        onMouseLeave={() => setActiveHelp(null)}
+        className="text-gray-400 hover:text-indigo-500 transition-colors"
+      >
+        <HelpCircle size={14} />
+      </span>
+      {activeHelp === id && (
+        <div className="absolute z-10 bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 p-2 bg-gray-700 text-white text-[12px] rounded shadow-lg animate-in fade-in zoom-in duration-200">
+          {text}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 mb-1 border-8 border-transparent border-t-gray-700" />
+        </div>
+      )}
+    </span>
+  );
   const tagsArray = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t !== '') : [];
   const handleSmartAssist = async () => {
     if (!formData.title) {
@@ -127,12 +145,14 @@ function App() {
     return isTitleValid && isDescriptionValid && isTagsValid && isUrlValid;
   };
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen p-8 bg-[#f8fafc] bg-[radial-gradient(at_top_left,_#e0e7ff_0%,_transparent_50%),_radial-gradient(at_bottom_right,_#f1f5f9_0%,_transparent_50%)]">
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">Cadastrar Recurso</h1>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Título</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Título
+            <HelpButton id="title" text="Dê um nome claro e objetivo ao recurso para facilitar a busca futura." />
+            </label>
             <input 
               type="text"
               className={`block w-full border rounded-md p-2 outline-none transition-all ${titleError ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'}`}
@@ -144,9 +164,11 @@ function App() {
           </div>
           <div className="flex gap-4 items-end">
             <div className="flex-1">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Tipo</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Tipo
+              <HelpButton id="type" text="Selecione o formato do conteúdo: Vídeo (YouTube), PDF (Documentos) ou Link (Artigos)." />
+              </label>
               <select 
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                className="block w-full border border-gray-300 rounded-md px-2 h-11 outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                 value={formData.resource_type}
                 onChange={(e) => setFormData({...formData, resource_type: e.target.value})}
               >
@@ -158,7 +180,7 @@ function App() {
             <button 
               onClick={handleSmartAssist} 
               disabled={loading || titleError || formData.title.length === 0} 
-              className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all h-11 font-medium
+              className={`flex items-center justify-center gap-2 px-4 rounded-md transition-all h-11 font-medium flex-none w-[240px] whitespace-nowrap
                 ${loading || titleError || formData.title.length === 0
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300' 
                   : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm active:scale-95'
@@ -169,7 +191,17 @@ function App() {
             </button>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Descrição</label>
+            <div className="flex items-center gap-2 h-6 mb-2">
+              <label className="text-sm font-semibold text-gray-700 flex items-center leading-none">Descrição
+              <HelpButton id="desc" text="Explique brevemente o que o aluno encontrará neste recurso. A IA pode preencher isso para você!" />
+              </label>
+              {loading && (
+                <span className="text-indigo-600 text-xs font-medium animate-pulse flex items-center gap-1">
+                  <Loader2 size={12} className="animate-spin" />
+                  IA escrevendo descrição...
+                </span>
+              )}
+            </div>
             <div className={`relative border rounded-md bg-white transition-all ${descError ? 'border-red-500 focus-within:ring-2 focus-within:ring-red-200' : 'border-gray-300 focus-within:ring-2 focus-within:ring-indigo-500'}`}>
               <textarea 
                 rows="4"
@@ -183,7 +215,17 @@ function App() {
             {descError && <p className="text-red-500 text-xs mt-1">Mínimo de 20 dígitos.</p>}
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Tags</label>
+            <div className="flex items-center gap-2 h-6 mb-2">
+              <label className="text-sm font-semibold text-gray-700 flex items-center leading-none">Tags
+              <HelpButton id="tags" text="Palavras-chave que ajudam a organizar seu conteúdo. Ex: 'React', 'Frontend', 'Iniciante'." />
+              </label>
+              {loading && (
+                <span className="text-indigo-600 text-xs font-medium animate-pulse flex items-center gap-1">
+                  <Loader2 size={12} className="animate-spin" />
+                  IA escrevendo tags...
+                </span>
+              )}
+            </div>
             <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border border-gray-300 rounded-md min-h-[60px] items-center">
               {tagsArray.map((tag, index) => (
                 <div key={index} className="flex items-center">
@@ -232,7 +274,9 @@ function App() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 font-semibold">URL</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">URL
+            <HelpButton id="url" text="Insira o link completo começando com http:// ou https:// para que o recurso possa ser acessado." />
+            </label>
             <input 
               type="url"
               className={`block w-full border rounded-md p-2 outline-none transition-all ${urlError ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'}`}
