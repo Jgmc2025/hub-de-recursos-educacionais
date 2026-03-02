@@ -1,6 +1,8 @@
 import { Sparkles, ArrowRight, Zap, Shield } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const Home = ({ onStart, onViewList }) => {
+const Home = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
       <div className="fixed inset-0 -z-10 bg-[#f8fafc] bg-[radial-gradient(at_top_left,_#e0e7ff_0%,_transparent_50%),_radial-gradient(at_bottom_right,_#f1f5f9_0%,_transparent_50%)]"></div>
@@ -12,7 +14,7 @@ const Home = ({ onStart, onViewList }) => {
           <Zap fill="currentColor" size={24} />
           HUB EDU
         </button>
-        <button onClick={onViewList} className="text-sm font-bold text-indigo-600">Ver Repositório</button>
+        <button onClick={() => navigate('/list')} className="text-sm font-bold text-indigo-600">Ver Repositório</button>
       </nav>
       <main className="px-8 pt-16 pb-24 max-w-7xl mx-auto text-center">
         <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md border border-indigo-100 px-4 py-1.5 rounded-full text-indigo-600 text-xs font-bold mb-8 shadow-sm animate-fade-in">
@@ -27,7 +29,7 @@ const Home = ({ onStart, onViewList }) => {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
           <button 
-            onClick={onStart}
+            onClick={() => navigate('/create')}
             className="group flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-5 px-10 rounded-xl shadow-2xl shadow-indigo-200 transition-all hover:scale-105 active:scale-95 text-lg"
           >
             Cadastrar Recurso

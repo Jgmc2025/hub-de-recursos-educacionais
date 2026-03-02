@@ -9,10 +9,10 @@ import {
   Tag,
   X
 } from 'lucide-react';
-import Home from './Home';
-import App from './App'
+import { useNavigate } from 'react-router-dom';
 
-const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
+const Appointment = ({ onEdit }) => {
+  const navigate = useNavigate();
   const capitalizeFirst = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
@@ -25,7 +25,6 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [view, setView] = useState('list'); 
   const resourcesPerPage = 5;
   useEffect(() => {
     fetchResources();
@@ -88,25 +87,19 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
   };
   const totalPages = Math.ceil(filteredResources.length / resourcesPerPage);
   const hasActiveFilters = searchTitle !== '' || searchTags !== '' || filterType !== 'Todos';
-  if (view === 'home') {
-    return <Home onStart={() => setView('list')} />;
-  }
-  if (view === 'app') {
-    return <App onStart={() => setView('list')} />;
-  }
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 pb-20">
       <div className="fixed inset-0 -z-10 bg-[#f8fafc] bg-[radial-gradient(at_top_left,_#e0e7ff_0%,_transparent_50%),_radial-gradient(at_bottom_right,_#f1f5f9_0%,_transparent_50%)]"></div>
       <nav className="px-8 py-6 flex justify-between items-center max-w-7xl mx-auto border-b border-indigo-50 mb-8 bg-white/30 backdrop-blur-md rounded-b-2xl shadow-sm">
         <button 
-          onClick={onBack}
+          onClick={() => navigate('/')}
           className="flex items-center gap-2 font-black text-2xl tracking-tighter text-indigo-600 hover:scale-105 transition-transform active:scale-95"
           title="Voltar para a Home"
         >
           <Zap fill="currentColor" size={24} />
           HUB EDU
         </button>
-        <button onClick={onNavigateToCreate} className="text-sm font-bold text-indigo-600">Cadastrar Recurso</button>
+        <button onClick={() => navigate('/create')} className="text-sm font-bold text-indigo-600">Cadastrar Recurso</button>
       </nav>
       <div className="max-w-4xl mx-auto px-6">
         <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl p-8 border border-white">
