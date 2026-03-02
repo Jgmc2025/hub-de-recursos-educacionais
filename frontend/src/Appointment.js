@@ -13,6 +13,9 @@ import Home from './Home';
 import App from './App'
 
 const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
+  const capitalizeFirst = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
   const [selectedResource, setSelectedResource] = useState(null);
   const closeDetails = () => setSelectedResource(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -142,7 +145,7 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
                           placeholder="Ex: Aula de React..."
                           className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-indigo-500/20"
                           value={searchTitle}
-                          onChange={(e) => setSearchTitle(e.target.value)}
+                          onChange={(e) => setSearchTitle(capitalizeFirst(e.target.value))}
                         />
                       </div>
                       <div>
@@ -162,10 +165,13 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
                         <label className="block text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Tags</label>
                         <input 
                           type="text"
-                          placeholder="Ex: Frontend, IA..."
+                          placeholder="Ex: Frontend,IA..."
                           className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-indigo-500/20"
                           value={searchTags}
-                          onChange={(e) => setSearchTags(e.target.value)}
+                          onChange={(e) => {
+                            const valueWithoutSpaces = e.target.value.replace(/\s/g, '');
+                            setSearchTags(capitalizeFirst(valueWithoutSpaces));
+                          }}
                         />
                       </div>
                       {hasActiveFilters && (
