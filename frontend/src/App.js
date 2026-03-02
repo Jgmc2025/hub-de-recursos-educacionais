@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle, Zap, FilePlus, Trash2 } from 'lucide-react';
-import Home from './Home';
-import Appointment from './Appointment';
+import { useNavigate } from 'react-router-dom';
 
-function App() {
-  const [editingResource, setEditingResource] = useState(null);
+function App({ editingResource, setEditingResource }) {
+  const navigate = useNavigate();
   const capitalizeFirst = (str) => {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
-  const [view, setView] = useState('home');
   const [activeHelp, setActiveHelp] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null)
   const [isAdding, setIsAdding] = useState(false); 
@@ -107,7 +105,7 @@ function App() {
         alert("Recurso salvo com sucesso!");
       }
       setEditingResource(null); 
-      setView('list'); 
+      navigate('/list');
     } catch (error) {
       if (error.response && (error.response.status === 400 || error.response.status === 409)) {
           alert("Ops! Esta URL já está cadastrada no sistema.");
@@ -173,31 +171,19 @@ function App() {
     }
     return isTitleValid && isDescriptionValid && isTagsValid && isUrlValid;
   };
-  if (view === 'home') {
-    return <Home onStart={() => { setEditingResource(null); setView('create'); }} onViewList={() => setView('list')} />;
-  }
-  if (view === 'list') {
-    return (
-      <Appointment 
-        onNavigateToCreate={() => { setEditingResource(null); setView('create'); }} 
-        onEdit={(res) => { setEditingResource(res); setView('create'); }} 
-        onBack={() => setView('home')} 
-      />
-    );
-  }
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 pb-20">
       <div className="fixed inset-0 -z-10 bg-[#f8fafc] bg-[radial-gradient(at_top_left,_#e0e7ff_0%,_transparent_50%),_radial-gradient(at_bottom_right,_#f1f5f9_0%,_transparent_50%)]"></div>
       <nav className="px-8 py-6 flex justify-between items-center max-w-7xl mx-auto border-b border-indigo-50 mb-8 bg-white/30 backdrop-blur-md rounded-b-2xl shadow-sm">
         <button 
-          onClick={() => setView('home')}
           className="flex items-center gap-2 font-black text-2xl tracking-tighter text-indigo-600 hover:scale-105 transition-transform active:scale-95"
           title="Voltar para a Home"
+          onClick={() => navigate('/')}
         >
           <Zap fill="currentColor" size={24} />
           HUB EDU
         </button>
-        <button onClick={() => setView('list')} className="text-sm font-bold text-indigo-600">Ver Repositório</button>
+        <button onClick={() => navigate('/list')} className="text-sm font-bold text-indigo-600">Ver Repositório</button>
       </nav>
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6">
         <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2"><FilePlus className="text-indigo-600" size={24} />Cadastrar Recurso</h1>
