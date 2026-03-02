@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
-  Search, FileText, Video, Link as LinkIcon, 
+  FileText, Video, Link as LinkIcon, 
   Trash2, ChevronLeft, ChevronRight, ExternalLink, 
   Zap, FileStack,
   Filter,
@@ -15,7 +15,6 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
   const [filterType, setFilterType] = useState('Todos');
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [view, setView] = useState('list'); 
   const resourcesPerPage = 5;
@@ -43,9 +42,8 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
     }
   };
   const filteredResources = resources.filter(res => {
-    const matchesTitle = res.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = filterType === 'Todos' || res.resource_type === filterType;
-    return matchesTitle && matchesType;
+    return matchesType;
   });
   const indexOfLastItem = currentPage * resourcesPerPage;
   const indexOfFirstItem = indexOfLastItem - resourcesPerPage;
@@ -58,9 +56,6 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
     }
   };
   const totalPages = Math.ceil(filteredResources.length / resourcesPerPage);
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, filterType]);
   if (view === 'home') {
     return <Home onStart={() => setView('list')} />;
   }
@@ -92,7 +87,6 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
                 </h1>
                 <p className="text-slate-500 text-sm mt-1 font-medium italic">Gerencie seus materiais didáticos.</p>
               </div>
-              {filteredResources.length > 0 &&
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative min-w-[160px]">
                   <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
@@ -107,7 +101,7 @@ const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
                     <option value="Link">Links</option>
                   </select>
                 </div>
-              </div>}
+              </div>
             </div>
           </div>
           <div className="border border-slate-100 rounded-xl overflow-hidden bg-white shadow-inner">
