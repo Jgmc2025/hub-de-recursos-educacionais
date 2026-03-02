@@ -11,7 +11,7 @@ import {
 import Home from './Home';
 import App from './App'
 
-const Appointment = ({ onNavigateToCreate, onBack }) => {
+const Appointment = ({ onNavigateToCreate, onBack, onEdit }) => {
   const [filterType, setFilterType] = useState('Todos');
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -133,6 +133,7 @@ const Appointment = ({ onNavigateToCreate, onBack }) => {
                   <tr key={res.id} className="hover:bg-slate-50/80 transition-colors group">
                     <td className="px-6 py-6 text-center">
                       <button 
+                        onClick={() => onEdit(res)}
                         className="inline-flex items-center justify-center p-2.5 text-slate-700 bg-white border-2 border-slate-200 rounded-xl hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50 transition-all active:scale-90 shadow-sm"
                         title="Editar recurso"
                       >

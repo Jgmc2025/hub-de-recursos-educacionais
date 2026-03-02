@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle, Zap, FilePlus } from 'lucide-react';
 import Home from './Home';
 import Appointment from './Appointment';
 
 function App() {
+  const [editingResource, setEditingResource] = useState(null);
   const capitalizeFirst = (str) => {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -23,6 +24,19 @@ function App() {
     tags: '',
     url: ''
   });
+  useEffect(() => {
+    if (editingResource) {
+      setFormData({
+        title: editingResource.title,
+        description: editingResource.description,
+        resource_type: editingResource.resource_type,
+        tags: editingResource.tags,
+        url: editingResource.url
+      });
+    } else {
+      setFormData({ title: '', description: '', resource_type: 'Vídeo', tags: '', url: '' });
+    }
+  }, [editingResource]);
   const HelpButton = ({ id, text }) => (
     <span className="relative inline-block ml-2 align-middle">
       <span
@@ -91,15 +105,15 @@ function App() {
         url: formData.url,
         tags: tagsArray.join(', ')
       };
-      await axios.post('http://127.0.0.1:8000/resources', payload);
-      alert("Recurso salvo com sucesso!");
-      setFormData({ 
-        title: '', 
-        description: '', 
-        resource_type: 'Vídeo', 
-        tags: '', 
-        url: '' 
-      });
+      if (editingResource) {
+        await axios.put(`http://127.0.0.1:8000/resources/${editingResource.id}`, payload);
+        alert("Recurso atualizado com sucesso!");
+      } else {
+        await axios.post('http://127.0.0.1:8000/resources', payload);
+        alert("Recurso salvo com sucesso!");
+      }
+
+      setEditingResource(null); 
       setView('list'); 
     } catch (error) {
       console.error("Erro ao salvar:", error);
@@ -164,17 +178,13 @@ function App() {
     return isTitleValid && isDescriptionValid && isTagsValid && isUrlValid;
   };
   if (view === 'home') {
-    return (
-      <Home 
-        onStart={() => setView('create')} 
-        onViewList={() => setView('list')} 
-      />
-    );
+    return <Home onStart={() => { setEditingResource(null); setView('create'); }} onViewList={() => setView('list')} />;
   }
   if (view === 'list') {
     return (
       <Appointment 
-        onNavigateToCreate={() => setView('create')} 
+        onNavigateToCreate={() => { setEditingResource(null); setView('create'); }} 
+        onEdit={(res) => { setEditingResource(res); setView('create'); }} 
         onBack={() => setView('home')} 
       />
     );
