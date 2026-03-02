@@ -5,12 +5,13 @@ import {
   Trash2, ChevronLeft, ChevronRight, ExternalLink, 
   Zap, FileStack,
   Filter,
-  Edit3
+  Edit3,
+  Tag
 } from 'lucide-react';
 import Home from './Home';
 import App from './App'
 
-const Appointment = ({ onNavigateToCreate }) => {
+const Appointment = ({ onNavigateToCreate, onBack }) => {
   const [filterType, setFilterType] = useState('Todos');
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +68,7 @@ const Appointment = ({ onNavigateToCreate }) => {
       <div className="fixed inset-0 -z-10 bg-[#f8fafc] bg-[radial-gradient(at_top_left,_#e0e7ff_0%,_transparent_50%),_radial-gradient(at_bottom_right,_#f1f5f9_0%,_transparent_50%)]"></div>
       <nav className="px-8 py-6 flex justify-between items-center max-w-7xl mx-auto border-b border-indigo-50 mb-8 bg-white/30 backdrop-blur-md rounded-b-2xl shadow-sm">
         <button 
-          onClick={() => setView('home')}
+          onClick={onBack}
           className="flex items-center gap-2 font-black text-2xl tracking-tighter text-indigo-600 hover:scale-105 transition-transform active:scale-95"
           title="Voltar para a Home"
         >
@@ -154,7 +155,7 @@ const Appointment = ({ onNavigateToCreate }) => {
                             href={res.url} 
                             target="_blank" 
                             rel="noreferrer" 
-                            className="flex items-center justify-center p-1.5 bg-slate-800 text-white rounded-md hover:bg-slate-900 transition-colors shadow-sm shrink-0" 
+                            className="flex items-center justify-center p-1.5 bg-slate-700 text-white rounded-md transition-colors shadow-sm shrink-0" 
                             title="Acessar URL"
                           >
                             <ExternalLink size={14} />
@@ -165,8 +166,9 @@ const Appointment = ({ onNavigateToCreate }) => {
                         </p>
                         <div className="flex flex-wrap gap-1.5">
                           {res.tags && res.tags.split(',').map((tag, i) => (
-                            <span key={i} className="text-xs bg-indigo-50 text-indigo-500 px-2 py-0.5 rounded font-bold tracking-wider border border-indigo-100/50">
-                              {tag.trim()}
+                            <span key={i} className="inline-flex items-center gap-1.5 text-xs bg-indigo-50 text-indigo-500 px-2 py-0.5 rounded font-bold tracking-wider border border-indigo-100/50">
+                              <Tag size={10} />
+                              {tag}
                             </span>
                           ))}
                         </div>
@@ -185,25 +187,26 @@ const Appointment = ({ onNavigateToCreate }) => {
                 ))}
               </tbody>
             </table>
-            <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-tight">
-              <span>{filteredResources.length} {filteredResources.length === 1 ? 'Material' : 'Materiais'}</span>
-              <div className="flex gap-2">
-                <button 
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(p => p - 1)}
-                  className="p-1.5 bg-white rounded-lg border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-                <button 
-                  disabled={indexOfLastItem >= filteredResources.length}
-                  onClick={() => setCurrentPage(p => p + 1)}
-                  className="p-1.5 bg-white rounded-lg border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
-                >
-                  <ChevronRight size={18} />
-                </button>
-              </div>
-            </div>
+            {filteredResources.length > 0 &&
+            <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-tight"> 
+                {filteredResources.length} {filteredResources.length === 1 ? 'Material' : 'Materiais'}
+                <div className="flex gap-2">
+                  <button 
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(p => p - 1)}
+                    className="p-1.5 bg-white rounded-lg border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                  <button 
+                    disabled={indexOfLastItem >= filteredResources.length}
+                    onClick={() => setCurrentPage(p => p + 1)}
+                    className="p-1.5 bg-white rounded-lg border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+            </div>}
           </div>
         </div>
       </div>

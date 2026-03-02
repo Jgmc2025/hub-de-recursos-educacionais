@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle, Zap } from 'lucide-react';
+import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle, Zap, FilePlus } from 'lucide-react';
 import Home from './Home';
 import Appointment from './Appointment';
 
@@ -164,10 +164,20 @@ function App() {
     return isTitleValid && isDescriptionValid && isTagsValid && isUrlValid;
   };
   if (view === 'home') {
-    return <Home onStart={() => setView('create')} />;
+    return (
+      <Home 
+        onStart={() => setView('create')} 
+        onViewList={() => setView('list')} 
+      />
+    );
   }
   if (view === 'list') {
-    return <Appointment onNavigateToCreate={() => setView('create')} onBack={() => setView('home')} />;
+    return (
+      <Appointment 
+        onNavigateToCreate={() => setView('create')} 
+        onBack={() => setView('home')} 
+      />
+    );
   }
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 pb-20">
@@ -184,7 +194,8 @@ function App() {
         <button onClick={() => setView('list')} className="text-sm font-bold text-indigo-600">Ver Repositório</button>
       </nav>
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Cadastrar Recurso</h1>
+        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2"><FilePlus className="text-indigo-600" size={24} />Cadastrar Recurso</h1>
+        <p className="text-slate-500 text-sm mt-1 font-medium italic mb-8">Registre seus materiais didáticos.</p>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Título
