@@ -1,10 +1,10 @@
 import os
 import json
-from openai import OpenAI
+from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
-client = OpenAI( api_key=os.getenv("API_KEY"), base_url=os.getenv("BASE_URL"))
+client = Groq(api_key=os.getenv("API_KEY"))
 def generate_educational_metadata(title: str, resource_type: str):
   prompt = f"""
   Você é um Assistente Pedagógico.
