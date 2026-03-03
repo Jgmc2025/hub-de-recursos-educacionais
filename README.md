@@ -1,65 +1,53 @@
 # 🚀 Hub Inteligente de Recursos Educacionais
 
-Este projeto é uma aplicação Fullstack desenvolvida para centralizar e otimizar o cadastro de materiais didáticos. O grande diferencial é o **Smart Assist**, um assistente de IA que sugere descrições e tags automaticamente com base no título do recurso.
-
----
+Este projeto é uma aplicação Fullstack desenvolvida para centralizar e otimizar o gerenciamento de materiais didáticos. O diferencial estratégico é o **Smart Assist**, um assistente de IA configurado como um **Assistente Pedagógico** para gerar descrições e tags automáticas, agilizando o trabalho de conteudistas.
 
 ## 🛠️ Tecnologias Utilizadas
 
 ### Backend
-- **Linguagem:** Python 3.10+
-- **Framework:** FastAPI
-- **Validations:** Pydantic
-- **Banco de Dados:** SQLite (ou PostgreSQL)
-- **IA:** Google Gemini API (LLM)
+- **Linguagem:** Python 3.12+
+- **Framework:** FastAPI (RESTful API)
+- **Validação:** Pydantic
+- **ORM:** SQLAlchemy
+- **Banco de Dados:** SQLite (persistência local)
+- **IA:** Integração com LLM via Groq/OpenAI SDK
 
 ### Frontend
-- **Framework:** React.js
+- **Framework:** React.js (SPA)
 - **Estilização:** Tailwind CSS
-- **Gerenciamento de Estado:** Hooks (useState/useEffect)
+- **Estado:** React Hooks e gerenciamento de *loading states* para IA
 
-### DevOps & Qualidade
-- **CI/CD:** GitHub Actions (Linting com Flake8)
-- **Logs:** Logging estruturado com métricas de latência da IA.
-
----
-
-## 🏗️ Arquitetura do Sistema
-
-A aplicação segue o padrão de separação de responsabilidades:
-- **Client-Side:** React com hooks para gerenciamento de estado assíncrono.
-- **Server-Side:** FastAPI utilizando Injeção de Dependências para persistência de dados.
-- **AI Layer:** Integração com LLMs via Groq com estratégia de **Fallback** (resiliência caso a API falhe).
+### DevOps & Observabilidade (Diferenciais)
+- **CI:** Pipeline via GitHub Actions com Linting (Flake8)
+- **Logs Estruturados:** Monitoramento de `TokenUsage` e `Latency`
+- **Health Check:** Endpoint dedicado para verificação de status do sistema
 
 ## ✨ Funcionalidades
 
-- [x] **CRUD Completo:** Gestão de vídeos, PDFs e links.
-- [x] **Smart Assist:** Geração de metadados via IA para agilizar o trabalho do conteudista.
-- [x] **Observabilidade:** Logs detalhados de tempo de resposta e uso de tokens da IA.
-- [x] **Interface Responsiva:** Feedback visual de carregamento e tratamento de erros.
-- [x] **Resiliência:** Mecanismo de fallback que garante o funcionamento do app mesmo com instabilidades na API de IA.
+- [x] **CRUD de Recursos:** Cadastro, listagem com paginação, edição e exclusão de materiais.
+- [x] **Campos Suportados:** Título, Descrição, Tipo (Vídeo, PDF, Link), URL e Tags.
+- [x] **Smart Assist (IA):** Botão para geração automática de metadados pedagógicos.
+- [x] **Observabilidade:** Logs técnicos detalhados para cada requisição de IA.
+- [x] **Resiliência:** Tratamento de erros e mecanismo de *fallback* caso a API de IA falhe.
+- [x] **Segurança:** Gestão de API Keys via variáveis de ambiente (.env).
 
----
+## 🏗️ Arquitetura e IA (Prompt Engineering)
+
+O sistema utiliza um **Prompt de Sistema** eficiente para garantir que a IA responda em formato **JSON estrito**. A IA é instruída a atuar como um "Assistente Pedagógico", garantindo que as descrições sejam úteis e educativas para os alunos.
+
+Exemplo de log estruturado gerado (conforme requisito):
+`[INFO] AI Request: Title="Matemática Financeira", TokenUsage=150, Latency=1.2s`
 
 ## 🚀 Como Rodar o Projeto
 
 ### Pré-requisitos
 - Python 3.10+
 - Node.js 18+
-- Uma API Key do Google Gemini (gratuita)
+- Uma API Key (Groq, Gemini ou OpenAI)
 
 ### Configuração do Backend
-1. Entre na pasta `/backend`.
-2. Crie um arquivo `.env` seguindo o modelo `.env.example`.
-3. Instale as dependências: `pip install -r requirements.txt`.
-4. Inicie o servidor: `uvicorn app.main:app --reload`.
-
-### Configuração do Frontend
-1. Entre na pasta `/frontend`.
-2. Instale as dependências: `npm install`.
-3. Inicie a aplicação: `npm start`.
-
----
-
-## 🛡️ Segurança
-As chaves de API são gerenciadas via variáveis de ambiente e o arquivo `.env` está devidamente listado no `.gitignore` para evitar vazamentos.
+1. Navegue até a pasta: `cd backend`.
+2. Crie e ative um ambiente virtual:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # Windows: .\venv\Scripts\activate
