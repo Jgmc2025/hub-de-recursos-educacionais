@@ -230,3 +230,6 @@ build/
 
 # banco de dados
 hub.db
+
+# package-lock.json
+package-lock.json
