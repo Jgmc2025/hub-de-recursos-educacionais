@@ -2,8 +2,11 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Sparkles, Loader2, Save, Tag, X, Plus, HelpCircle, Zap, FilePlus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
 function App({ editingResource, setEditingResource }) {
+  const [urlExists, setUrlExists] = useState(false);
+  const [checkingUrl, setCheckingUrl] = useState(false);
   const navigate = useNavigate();
   const capitalizeFirst = (str) => {
     if (!str) return "";
@@ -22,6 +25,35 @@ function App({ editingResource, setEditingResource }) {
     tags: '',
     url: ''
   });
+  const isUrlValid = (url) => {
+    try { new URL(url); return true; } catch { return false; }
+  };
+  useEffect(() => {
+    const verifyUrl = async () => {
+      const currentUrl = formData.url.trim().toLowerCase();
+      if (!currentUrl || !isUrlValid(formData.url)) {
+        setUrlExists(false);
+        return;
+      }
+      if (editingResource && currentUrl === editingResource.url.trim().toLowerCase()) {
+        setUrlExists(false);
+        return;
+      }
+      setCheckingUrl(true);
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/resources');
+        const exists = response.data.some(res => 
+          res.url.trim().toLowerCase() === currentUrl
+        );
+        setUrlExists(exists);
+      } catch (error) {
+        console.error("Erro ao validar URL:", error);
+      } finally {
+        setCheckingUrl(false);
+      }
+    };
+    verifyUrl()
+  }, [formData.url, editingResource]);
   useEffect(() => {
     if (editingResource) {
       setFormData({
@@ -55,7 +87,7 @@ function App({ editingResource, setEditingResource }) {
   const tagsArray = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t !== '') : [];
   const handleSmartAssist = async () => {
     if (!formData.title) {
-      alert("Digite um título primeiro!");
+      toast.error("Digite um título primeiro.");
       return;
     }
     setLoading(true);
@@ -71,7 +103,7 @@ function App({ editingResource, setEditingResource }) {
       });
     } catch (error) {
       console.error("Erro na IA:", error);
-      alert("O Serviço de Assistência por IA está indisponível no momento. Por favor, tente mais tarde.");
+      toast.error("O Serviço de Assistência por IA está indisponível no momento.");
     } finally {
       setLoading(false);
     }
@@ -80,14 +112,14 @@ function App({ editingResource, setEditingResource }) {
     const titleClean = formData.title.trim();
     const urlClean = formData.url.trim();
     if (titleClean.length < 3) {
-      alert("Por favor, insira um título mais descritivo.");
+      toast.error("Por favor, insira um título mais descritivo.");
       return false;
     }
     try {
       if (!urlClean) throw new Error();
       new URL(urlClean);
     } catch (error) {
-      alert("Por favor, insira um endereço de URL válido.");
+      toast.error("Por favor, insira um endereço de URL válido.");
       return false;
     }
     return true;
@@ -99,18 +131,18 @@ function App({ editingResource, setEditingResource }) {
       const payload = { ...formData, url: formData.url.trim(), tags: tagsArray.join(', ') };
       if (editingResource) {
         await axios.put(`http://127.0.0.1:8000/resources/${editingResource.id}`, payload);
-        alert("Recurso atualizado com sucesso!");
+        toast.success("Recurso atualizado com sucesso!");
       } else {
         await axios.post('http://127.0.0.1:8000/resources', payload);
-        alert("Recurso salvo com sucesso!");
+        toast.success("Recurso salvo com sucesso!");
       }
       setEditingResource(null); 
       navigate('/list');
     } catch (error) {
       if (error.response && (error.response.status === 400 || error.response.status === 409)) {
-          alert("Ops! Esta URL já está cadastrada no sistema.");
+          toast.error("Esta URL já está cadastrada no sistema.");
       } else {
-          alert("Erro ao conectar com o servidor.");
+          toast.error("Erro ao conectar com o servidor.");
       }
     } finally {
       setLoading(false);
@@ -130,7 +162,7 @@ function App({ editingResource, setEditingResource }) {
     }
     const isDuplicate = tagsArray.some((tag, i) => i !== index && tag.toLowerCase() === cleanEdit);
     if (isDuplicate) {
-      alert(`A tag "${cleanEdit}" já existe nesta lista.`);
+      toast.error(`Essa tag já existe nesta lista.`);
       setEditingIndex(null); 
       return;
     }
@@ -144,7 +176,7 @@ function App({ editingResource, setEditingResource }) {
     if (cleanTag) {
       const tagExists = tagsArray.some(t => t.toLowerCase() === cleanTag.toLowerCase());
       if (tagExists) {
-        alert("Esta tag já existe.");
+        toast.error("Esta tag já existe nesta lista.");
       } else {
         updateTagsString([...tagsArray, cleanTag]);
       }
@@ -154,30 +186,30 @@ function App({ editingResource, setEditingResource }) {
   };
   const titleError = formData.title.length > 0 && formData.title.trim().length < 3;
   const descError = formData.description.length > 0 && formData.description.trim().length < 20;
-  const isUrlValid = (url) => {
-    try { new URL(url); return true; } catch { return false; }
-  };
   const urlError = formData.url.length > 0 && !isUrlValid(formData.url);
   const isFormValid = () => {
     const isTitleValid = formData.title.trim().length >= 3;
     const isDescriptionValid = formData.description.trim().length >= 20;
     const isTagsValid = tagsArray.length > 0;
-    let isUrlValid = false;
-    try {
-      new URL(formData.url);
-      isUrlValid = true;
-    } catch (e) {
-      isUrlValid = false;
-    }
-    return isTitleValid && isDescriptionValid && isTagsValid && isUrlValid;
+    const isUrlFormatOk = isUrlValid(formData.url);
+    return (
+      isTitleValid && 
+      isDescriptionValid && 
+      isTagsValid && 
+      isUrlFormatOk && 
+      !urlExists && 
+      !checkingUrl &&
+      !loading
+    );
   };
   return (
     <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 pb-20">
+      <Toaster position="top-center"/>
       <div className="fixed inset-0 -z-10 bg-[#f8fafc] bg-[radial-gradient(at_top_left,_#e0e7ff_0%,_transparent_50%),_radial-gradient(at_bottom_right,_#f1f5f9_0%,_transparent_50%)]"></div>
       <nav className="px-8 py-6 flex justify-between items-center max-w-7xl mx-auto border-b border-indigo-50 mb-8 bg-white/30 backdrop-blur-md rounded-b-2xl shadow-sm">
         <button 
           className="flex items-center gap-2 font-black text-2xl tracking-tighter text-indigo-600 hover:scale-105 transition-transform active:scale-95"
-          title="Voltar para a Home"
+          title="Ir para menu"
           onClick={() => navigate('/')}
         >
           <Zap fill="currentColor" size={24} />
@@ -271,11 +303,7 @@ function App({ editingResource, setEditingResource }) {
               </div>
               {tagsArray.length > 0 && (
                 <button
-                  onClick={() => {
-                    if (window.confirm("Remover todas as tags?")) {
-                      setFormData({ ...formData, tags: '' });
-                    }
-                  }}
+                  onClick={() => { setFormData({ ...formData, tags: '' }) }}
                   className="text-gray-400 hover:text-red-500 transition-colors duration-200 p-1 rounded-md hover:bg-red-50"
                   title="Limpar todas as tags"
                 >
@@ -340,16 +368,26 @@ function App({ editingResource, setEditingResource }) {
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">URL
-            <HelpButton id="url" text="Insira o link completo começando com http:// ou https:// para que o recurso possa ser acessado." />
+              <HelpButton id="url" text="Insira o link completo começando com http:// ou https://." />
             </label>
+          <div className="relative">
             <input 
               type="url"
-              className={`block w-full border rounded-md p-2 outline-none transition-all ${urlError ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'}`}
+              className={`block w-full border rounded-md p-2 outline-none transition-all ${
+                (urlError || urlExists) ? 'border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-300 focus:ring-2 focus:ring-indigo-500'
+              }`}
               value={formData.url}
               onChange={(e) => setFormData({...formData, url: e.target.value})}
               placeholder='https://youtube.com/...'
             />
+            {checkingUrl && (
+              <div className="absolute right-3 top-2.5">
+                <Loader2 className="animate-spin text-indigo-400" size={18} />
+              </div>
+            )}
+          </div>
             {urlError && <p className="text-red-500 text-xs mt-1">Insira uma URL válida.</p>}
+            {urlExists && <p className="text-red-500 text-xs mt-1">Esta URL já está cadastrada.</p>}
           </div>
           <button 
             onClick={handleSave}
@@ -361,7 +399,7 @@ function App({ editingResource, setEditingResource }) {
               }`}
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-            Salvar
+            {loading ? 'Salvando...' : 'Salvar'}
           </button>
         </div>
       </div>
