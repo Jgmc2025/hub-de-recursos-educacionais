@@ -236,7 +236,7 @@ const Appointment = ({ onEdit }) => {
                       {resources.length > 0 && (
                         <button 
                           onClick={deleteAllResources}
-                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all group/all text-slate-700"
+                          className="p-1.5 hover:text-red-600 hover:bg-red-50 rounded-md transition-all group/all text-slate-600"
                           title="Excluir tudo"
                         >
                           <Trash2 size={14} className="group-hover/all:scale-110 transition-transform" />
@@ -397,7 +397,7 @@ const Appointment = ({ onEdit }) => {
               <div className="mt-10 pt-6 flex gap-3">
                 <button 
                   onClick={() => { onEdit(selectedResource); closeDetails(); }}
-                  className="p-3.5 text-slate-500 bg-slate-50 border-2 border-slate-100 rounded-xl hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50 transition-all active:scale-90 shadow-sm text-slate-700"
+                  className="p-3.5 bg-slate-50 border-2 border-slate-100 rounded-xl hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50 transition-all active:scale-90 shadow-sm text-slate-700"
                   title="Editar recurso"
                 >
                   <Edit3 size={20} strokeWidth={2} />
@@ -413,7 +413,7 @@ const Appointment = ({ onEdit }) => {
                 </a>
                 <button 
                   onClick={() => { deleteResource(selectedResource.id); closeDetails(); }}
-                  className="p-3.5 text-slate-500 bg-slate-50 border-2 border-slate-100 rounded-xl hover:border-red-200 hover:text-red-600 hover:bg-red-50 transition-all active:scale-90 shadow-sm text-slate-700"
+                  className="p-3.5 bg-slate-50 border-2 border-slate-100 rounded-xl hover:border-red-200 hover:text-red-600 hover:bg-red-50 transition-all active:scale-90 shadow-sm text-slate-700"
                   title="Excluir recurso"
                 >
                   <Trash2 size={20} strokeWidth={2} />

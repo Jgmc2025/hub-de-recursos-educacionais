@@ -1,0 +1,29 @@
+{
+  "name": "hub-de-recursos-educacionais",
+  "version": "1.0.0",
+  "description": "Este projeto é uma aplicação Fullstack desenvolvida para centralizar e otimizar o gerenciamento de materiais didáticos. O diferencial estratégico é o **Smart Assist**, um assistente de IA configurado como um **Assistente Pedagógico** para gerar descrições e tags automáticas, agilizando o trabalho de conteudistas.",
+  "main": "index.js",
+  "scripts": {
+    "server": "cd backend && ./venv/bin/uvicorn app.main:app --reload",
+    "client": "cd frontend && npm run start",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "node": "npm install && cd frontend && npm install",
+    "env": "python3 -m venv backend/venv && cp -n backend/.env.example backend/.env || true",
+    "setup": "npm run env && npm run node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jgmc2025/hub-de-recursos-educacionais.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Jgmc2025/hub-de-recursos-educacionais/issues"
+  },
+  "homepage": "https://github.com/Jgmc2025/hub-de-recursos-educacionais#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
