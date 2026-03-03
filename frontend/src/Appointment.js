@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 const Appointment = ({ onEdit }) => {
   const navigate = useNavigate();
@@ -40,35 +41,72 @@ const Appointment = ({ onEdit }) => {
       setLoading(false);
     }
   };
-  const deleteResource = async (id) => {
-    if (window.confirm("Tem certeza que deseja excluir este recurso?")) {
-      try {
-        await axios.delete(`http://127.0.0.1:8000/resources/${id}`);
-        fetchResources(); 
-      } catch (error) {
-        toast.error("Erro ao excluir recurso.");
+  const deleteResource = (id) => {
+    Swal.fire({
+      title: 'Remover Recurso?',
+      text: "Esta ação não poderá ser desfeita.",
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626', 
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Excluir',
+      cancelButtonText: 'Cancelar',
+      buttonsStyling: false,
+      reverseButtons: true,
+      width: 'auto',
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border border-slate-100 bg-white p-4',
+        title: 'text-xl font-bold text-slate-800', 
+        htmlContainer: 'text-sm text-slate-700 mt-1', 
+        confirmButton: 'bg-red-600 text-white text-sm font-bold px-6 py-2 rounded-xl mx-2 shadow-md shadow-red-200 active:scale-95 transition-all',
+        cancelButton: 'bg-slate-500 text-white text-sm font-bold px-6 py-2 rounded-xl mx-2 active:scale-95 transition-all'
       }
-    }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`http://127.0.0.1:8000/resources/${id}`);
+          fetchResources(); 
+          toast.success("Recurso excluído com sucesso!");
+        } catch (error) {
+          toast.error("Erro ao excluir recurso.");
+        }
+      }
+    });
   };
-  const deleteAllResources = async () => {
+  const deleteAllResources = () => {
     if (resources.length === 0) return;
-    const confirmFirst = window.confirm(
-      "Você está prestes a excluir todos os recursos do repositório. Esta ação não pode ser desfeita. Deseja continuar?"
-    );
-    if (confirmFirst) {
-      try {
-        setLoading(true);
-        await axios.delete('http://127.0.0.1:8000/resources/all');
-        setResources([]); 
-        toast.success("Repositório limpo com sucesso!");
-      } catch (error) {
-        console.error("Erro ao excluir todos:", error);
-        toast.error("Erro ao conectar com o servidor para excluir tudo.");
-      } finally {
-        setLoading(false);
-        fetchResources(); 
+    Swal.fire({
+      title: 'Limpar Repositório?',
+      text: "Você está prestes a apagar todos os recursos.",
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626', 
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Excluir',
+      cancelButtonText: 'Cancelar',
+      buttonsStyling: false,
+      reverseButtons: true,
+      width: 'auto',
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border border-slate-100 bg-white p-4',
+        title: 'text-xl font-bold text-slate-800', 
+        htmlContainer: 'text-sm text-slate-700 mt-1', 
+        confirmButton: 'bg-red-600 text-white text-sm font-bold px-6 py-2 rounded-xl mx-2 shadow-md shadow-red-200 active:scale-95 transition-all', 
+        cancelButton: 'bg-slate-500 text-white text-sm font-bold px-6 py-2 rounded-xl mx-2 active:scale-95 transition-all'
       }
-    }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          setLoading(true);
+          await axios.delete('http://127.0.0.1:8000/resources/all');
+          setResources([]); 
+          toast.success("Repositório limpo com sucesso!");
+        } catch (error) {
+          toast.error("Erro ao conectar com o servidor.");
+        } finally {
+          setLoading(false);
+          fetchResources(); 
+        }
+      }
+    });
   };
   const filteredResources = resources.filter(res => {
     const matchesType = filterType === 'Todos' || res.resource_type === filterType;

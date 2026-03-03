@@ -303,11 +303,7 @@ function App({ editingResource, setEditingResource }) {
               </div>
               {tagsArray.length > 0 && (
                 <button
-                  onClick={() => {
-                    if (window.confirm("Remover todas as tags?")) {
-                      setFormData({ ...formData, tags: '' });
-                    }
-                  }}
+                  onClick={() => { setFormData({ ...formData, tags: '' }) }}
                   className="text-gray-400 hover:text-red-500 transition-colors duration-200 p-1 rounded-md hover:bg-red-50"
                   title="Limpar todas as tags"
                 >
