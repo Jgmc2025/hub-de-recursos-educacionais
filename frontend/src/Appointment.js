@@ -226,7 +226,7 @@ const Appointment = ({ onEdit }) => {
             </div>
           </div>
           <div className="border border-slate-100 rounded-xl overflow-hidden bg-white shadow-inner">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse table-fixed">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
                   <th className="w-24 px-6 py-4 text-[11px] font-black text-slate-600 uppercase tracking-widest text-center">Editar</th>
@@ -347,13 +347,11 @@ const Appointment = ({ onEdit }) => {
             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
             onClick={closeDetails}
           />
-          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in slide-in-from-bottom-4 duration-300">
-            <div className={`h-2 w-full ${
+          <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in slide-in-from-bottom-4 duration-300">            <div className={`h-2 w-full shrink-0 ${
               selectedResource.resource_type === 'Vídeo' ? 'bg-red-500' : 
               selectedResource.resource_type === 'PDF' ? 'bg-blue-500' : 'bg-emerald-500'
             }`} />
-            
-            <div className="p-8">
+            <div className="p-8 overflow-y-auto custom-scrollbar">
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-3">
                   <div className="p-3 bg-slate-100 rounded-xl">
